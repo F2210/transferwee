@@ -121,7 +121,7 @@ def _file_unquote(file: str) -> str:
     return urllib.parse.unquote(file).replace('../', '').replace('/', '').replace('\\', '')
 
 
-def download(url: str, file: str = '') -> None:
+def download(url: str, path: str, file: str = '') -> None:
     """Given a `we.tl/' or `wetransfer.com/downloads/' download it.
 
     First a direct link is retrieved (via download_url()), the filename can be
@@ -134,7 +134,7 @@ def download(url: str, file: str = '') -> None:
         file = _file_unquote(urllib.parse.urlparse(dl_url).path.split('/')[-1])
 
     r = requests.get(dl_url, stream=True)
-    with open(file, 'wb') as f:
+    with open(os.path.join(path, file), 'wb') as f:
         for chunk in r.iter_content(chunk_size=1024):
             f.write(chunk)
 
@@ -341,54 +341,3 @@ def upload(files: List[str], display_name: str = '', message: str = '', sender: 
         _upload_chunks(transfer_id, file_id, f, s)
 
     return _finalize_upload(transfer_id, s)['shortened_url']
-
-
-if __name__ == '__main__':
-    from sys import exit
-    import argparse
-
-    ap = argparse.ArgumentParser(
-        prog='transferwee',
-        description='Download/upload files via wetransfer.com'
-    )
-    sp = ap.add_subparsers(dest='action', help='action')
-
-    # download subcommand
-    dp = sp.add_parser('download', help='download files')
-    dp.add_argument('-g', action='store_true',
-                    help='only print the direct link (without downloading it)')
-    dp.add_argument('-o', type=str, default='', metavar='file',
-                    help='output file to be used')
-    dp.add_argument('url', nargs='+', type=str, metavar='url',
-                    help='URL (we.tl/... or wetransfer.com/downloads/...)')
-
-    # upload subcommand
-    up = sp.add_parser('upload', help='upload files')
-    up.add_argument('-n', type=str, default='', metavar='display_name',
-                    help='title for the transfer')
-    up.add_argument('-m', type=str, default='', metavar='message',
-                    help='message description for the transfer')
-    up.add_argument('-f', type=str, metavar='from', help='sender email')
-    up.add_argument('-t', nargs='+', type=str, metavar='to',
-                    help='recipient emails')
-    up.add_argument('files', nargs='+', type=str, metavar='file',
-                    help='files to upload')
-
-    args = ap.parse_args()
-
-    if args.action == 'download':
-        if args.g:
-            for u in args.url:
-                print(download_url(u))
-        else:
-            for u in args.url:
-                download(u, args.o)
-        exit(0)
-
-    if args.action == 'upload':
-        print(upload(args.files, args.n, args.m, args.f, args.t))
-        exit(0)
-
-    # No action selected, print help message
-    ap.print_help()
-    exit(1)
