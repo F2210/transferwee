@@ -19,7 +19,7 @@ install_requirements = [
 
 setup(
     name='transferwee',
-    version='1.0.2',
+    version='1.0.3',
     packages=find_packages(),
     install_requires=install_requirements,
     include_package_data=True,
