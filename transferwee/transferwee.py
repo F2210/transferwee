@@ -121,7 +121,7 @@ def _file_unquote(file: str) -> str:
     return urllib.parse.unquote(file).replace('../', '').replace('/', '').replace('\\', '')
 
 
-def download(url: str, path: str, file: str = '') -> None:
+def download(url: str, path: str, file: str = '') -> tuple:
     """Given a `we.tl/' or `wetransfer.com/downloads/' download it.
 
     First a direct link is retrieved (via download_url()), the filename can be
