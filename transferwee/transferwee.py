@@ -138,7 +138,7 @@ def download(url: str, path: str, file: str = '') -> None:
         for chunk in r.iter_content(chunk_size=1024):
             f.write(chunk)
 
-    return os.path.join(path, file)
+    return (os.path.join(path, file), file)
 
 def _file_name_and_size(file: str) -> dict:
     """Given a file, prepare the "name" and "size" dictionary.
