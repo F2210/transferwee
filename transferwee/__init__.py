@@ -1,1 +1,1 @@
-import transferwee.transferwee
+import transferwee.transferwee as transferwee
